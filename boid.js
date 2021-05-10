@@ -46,7 +46,7 @@ class  Boid {
     static maxVelocity = 2;
     constructor(){
         this.position = vec3.fromValues(0,0,0);
-        this.velocity = vec3.fromValues(0,0,1);
+        this.velocity = vec3.fromValues(0,0,-1);
         this.center = vec3.fromValues(0.5,0.5,0.5);
         this.xAxis = vec3.fromValues(1,0,0);
         this.yAxis = vec3.fromValues(0,1,0);
@@ -184,7 +184,7 @@ function makeObstacleArr(){
     for(let i=0; i<numObstacles; i++){
         obstacleArr[i] = new Obstacle();
         curObs = obstacleArr[i];
-        curObs.translation = vec3.fromValues(Math.random()*worldFactor*0.5, Math.random()*worldFactor*0.5, Math.random()*worldFactor*0.5);
+        curObs.translation = vec3.fromValues(Math.random()*worldFactor*0.75, Math.random()*worldFactor*0.75, Math.random()*worldFactor*0.75);
     }
 }
 
@@ -196,7 +196,7 @@ function pushNewBoid(){
 
 function pushNewObstacle(){
     let obstacle = new Obstacle();
-    obstacle.translation(Math.random()*worldFactor, Math.random()*worldFactor, Math.random()*worldFactor);
+    obstacle.translation = vec3.fromValues(Math.random()*worldFactor, Math.random()*worldFactor, Math.random()*worldFactor);
     obstacleArr.push(obstacle);
 }
 

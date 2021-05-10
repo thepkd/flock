@@ -1,4 +1,4 @@
-var defaultEye = vec3.fromValues(0,0,-5); // default eye position in world space
+var defaultEye = vec3.fromValues(0,0,-21); // default eye position in world space
 var defaultCenter = vec3.fromValues(0,0,0); // default view direction in world space
 var defaultUp = vec3.fromValues(0,1,0); // default view up vector
 var lightAmbient = vec3.fromValues(1,1,1); // default light ambient emission
@@ -36,11 +36,12 @@ function setupWebGL() {
       imageContext = imageCanvas.getContext("2d"); 
       var bkgdImage = new Image(); 
       bkgdImage.crossorigin = "anonymous";
-      bkgdImage.src = "https://ncsucgclass.github.io/prog3/sky.jpg";
+      //bkgdImage.src = "https://ncsucgclass.github.io/prog3/sky.jpg";
       //bkgdImage.src = "https://raw.githubusercontent.com/thepkd/4x4bitFusion/master/564.png";
+      bkgdImage.src = LEGEND_URL;
       bkgdImage.onload = function(){
           var iw = bkgdImage.width, ih = bkgdImage.height;
-          //imageContext.drawImage(bkgdImage,0,0,iw,ih,0,0,cw,ch);   
+          imageContext.drawImage(bkgdImage,0,0,iw,ih,0,0,cw,ch);   
      }
 
      

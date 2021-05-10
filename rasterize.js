@@ -7,6 +7,7 @@ const INPUT_TRIANGLES_URL = INPUT_URL + "triangles.json"; // triangles file loc
 const INPUT_SPHERES_URL = INPUT_URL + "spheres.json"; // spheres file loc
 //const INPUT_ROOM_URL = INPUT_URL + "rooms.json"; // rooms file loc
 const INPUT_ROOM_URL = "https://raw.githubusercontent.com/thepkd/scratchpad/master/rooms.json"; // rooms file loc
+const LEGEND_URL = "https://raw.githubusercontent.com/thepkd/flock/master/newLegend.png";
 //
 //var defaultEye = vec3.fromValues(1,0.5,1); // default eye position in world space
 //var defaultCenter = vec3.fromValues(1.5,0.5,1.5); // default view direction in world space
@@ -92,17 +93,16 @@ function getJSONFile(url,descr) {
 // does stuff when keys are pressed
 function handleKeyDown(event) {
     
-    const modelEnum = {TRIANGLES: "triangles", SPHERE: "sphere"}; // enumerated model type
+    const modelEnum = {TRIANGLES: "triangles", SPHERE: "sphere", OBSTACLE: "obstacle"}; // enumerated model type
     const dirEnum = {NEGATIVE: -1, POSITIVE: 1}; // enumerated rotation direction
     
     function highlightModel(modelType,whichModel) {
         if (handleKeyDown.modelOn != null)
             handleKeyDown.modelOn.on = false;
         handleKeyDown.whichOn = whichModel;
-        if (modelType == modelEnum.TRIANGLES)
-            handleKeyDown.modelOn = inputTriangles[whichModel]; 
-        else
-            handleKeyDown.modelOn = inputSpheres[whichModel]; 
+        if (modelType == modelEnum.OBSTACLE){
+            handleKeyDown.modelOn = obstacleArr[whichModel]; 
+        }
         handleKeyDown.modelOn.on = true; 
     } // end highlight model
     
@@ -154,10 +154,10 @@ function handleKeyDown(event) {
             highlightModel(modelEnum.TRIANGLES,(handleKeyDown.whichOn > 0) ? handleKeyDown.whichOn-1 : numTriangleSets-1);
             break;
         case "ArrowUp": // select next sphere
-            highlightModel(modelEnum.SPHERE,(handleKeyDown.whichOn+1) % numSpheres);
+            highlightModel(modelEnum.OBSTACLE,(handleKeyDown.whichOn+1) % obstacleArr.length);
             break;
         case "ArrowDown": // select previous sphere
-            highlightModel(modelEnum.SPHERE,(handleKeyDown.whichOn > 0) ? handleKeyDown.whichOn-1 : numSpheres-1);
+            highlightModel(modelEnum.OBSTACLE,(handleKeyDown.whichOn > 0) ? handleKeyDown.whichOn-1 : obstacleArr.length-1);
             break;
             
         // view change
@@ -262,6 +262,12 @@ function handleKeyDown(event) {
             if(cohese) cohese = 0;
             else cohese = 1;
             console.log("cohese:" + cohese);
+            break;
+        case "KeyN": // Push new boid
+            pushNewBoid();
+            break;
+        case "KeyM": // Push new obstacle
+            pushNewObstacle();
             break;
         case "Backspace": // reset model transforms to default
             for (var whichTriSet=0; whichTriSet<numTriangleSets; whichTriSet++) {
@@ -648,6 +654,8 @@ function renderModels() {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,triangleBuffers[1]); // activate tri buffer
 
     const HIGHLIGHTMATERIALOBSTACLE = 
+        {ambient:[0.2,0.2,0.2], diffuse:[1,1,0], specular:[0.2,0.2,0.2], n:5, alpha:1, texture:false}; // hlht mat
+    const NORMALOBSTACLE = 
         {ambient:[0.2,0.2,0.2], diffuse:[0.5,0,0], specular:[0.2,0.2,0.2], n:5, alpha:1, texture:false}; // hlht mat
     
 
@@ -658,7 +666,10 @@ function renderModels() {
         gl.uniformMatrix4fv(mMatrixULoc, false, mMatrix); // pass in the m matrix
         gl.uniformMatrix4fv(pvmMatrixULoc, false, hpvmMatrix); // pass in the hpvm matrix
         
-        currMaterial = HIGHLIGHTMATERIALOBSTACLE;
+        if(obstacle.on)
+            currMaterial = HIGHLIGHTMATERIALOBSTACLE;
+        else    
+            currMaterial = NORMALOBSTACLE;
         
         gl.uniform3fv(ambientULoc,currMaterial.ambient); // pass in the ambient reflectivity
         gl.uniform3fv(diffuseULoc,currMaterial.diffuse); // pass in the diffuse reflectivity
